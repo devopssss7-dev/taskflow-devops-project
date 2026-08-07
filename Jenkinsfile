@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -19,14 +18,10 @@ pipeline {
         stage('Test Backend') {
             steps {
                 echo 'Testing backend...'
-
                 sh '''
                     docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
-
                     sleep 10
-
-                    docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T backend \
-		    python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read().decode())"
+                    docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T backend python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read().decode())"
                 '''
             }
         }
