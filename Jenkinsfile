@@ -19,10 +19,14 @@ pipeline {
         stage('Test Backend') {
             steps {
                 echo 'Testing backend...'
+
                 sh '''
-                    docker compose up -d
+                    docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+
                     sleep 10
-                    curl -f http://localhost:8000/health
+
+                    docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T backend \
+		    python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read().decode())"
                 '''
             }
         }
@@ -30,7 +34,7 @@ pipeline {
 
     post {
         always {
-            sh 'docker compose down || true'
+            sh 'docker compose -f docker-compose.yml -f docker-compose.ci.yml down || true'
         }
 
         success {

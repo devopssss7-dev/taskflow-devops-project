@@ -1,0 +1,10 @@
+services:
+
+  postgres:
+    ports: []
+
+  backend:
+    ports: []
+
+  frontend:
+    ports: []
