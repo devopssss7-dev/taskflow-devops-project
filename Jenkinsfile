@@ -15,12 +15,24 @@ pipeline {
             }
         }
 
+        stage('Security Scan') {
+            steps {
+                echo 'Scanning Docker images with Trivy...'
+                sh '''
+                    trivy image --severity HIGH,CRITICAL taskflow-ci2-backend
+                    trivy image --severity HIGH,CRITICAL taskflow-ci2-frontend
+                '''
+            }
+        }
+
         stage('Test Backend') {
             steps {
                 echo 'Testing backend...'
                 sh '''
                     docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+
                     sleep 10
+
                     docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T backend python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read().decode())"
                 '''
             }
